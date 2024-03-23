@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axiosService from "./services/axios";
 
 const Filter = ({ filter, handleFilter }) => {
-  <div>
-    filter shown with: <input onChange={handleFilter} value={filter} />
-  </div>;
+  return (
+    <div>
+      filter shown with: <input onChange={handleFilter} value={filter} />
+    </div>
+  );
 };
 
 const PersonForm = ({
@@ -14,38 +16,51 @@ const PersonForm = ({
   handleChangeNumber,
   handleSubmit,
 }) => {
-  <form onSubmit={handleSubmit}>
-    <div>
-      name: <input onChange={handleChangeName} value={newName} />
-    </div>
-    <div>
-      number: <input onChange={handleChangeNumber} value={newNumber} />
-    </div>
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        name: <input onChange={handleChangeName} value={newName} />
+      </div>
+      <div>
+        number: <input onChange={handleChangeNumber} value={newNumber} />
+      </div>
 
-    <div>
-      <button type="submit">add</button>
-    </div>
-  </form>;
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  );
 };
 
-const Persons = ({ persons, filter }) => {
+const Person = ({ person, handleDelete }) => {
+  return (
+    <div style={{ display: "flex" }}>
+      <p>
+        {person.name} {person.number}
+      </p>
+      <button onClick={() => handleDelete(person.id)}>delete</button>
+    </div>
+  );
+};
+
+const Persons = ({ persons, filter, handleDelete }) => {
   return filter
     ? persons
         .filter((person) =>
           person.name.toLowerCase().includes(filter.toLowerCase())
         )
-        .map((person, i) => {
+        .map((person) => {
           return (
-            <p key={person.name + i}>
-              {person.name} {person.number}
-            </p>
+            <Person
+              key={person.id}
+              person={person}
+              handleDelete={handleDelete}
+            />
           );
         })
-    : persons.map((person, i) => {
+    : persons.map((person) => {
         return (
-          <p key={person.name + i}>
-            {person.name} {person.number}
-          </p>
+          <Person key={person.id} person={person} handleDelete={handleDelete} />
         );
       });
 };
@@ -57,8 +72,7 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((res) => {
-      const data = res.data;
+    axiosService.getAll().then((data) => {
       setPersons(data);
     });
   }, []);
@@ -77,11 +91,33 @@ const App = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (persons.findIndex((person) => person.name === newName) !== -1)
-      return alert(`${newName} is already added to phonebook`);
-    setPersons(persons.concat({ name: newName, number: newNumber }));
+    if (persons.findIndex((person) => person.name === newName) !== -1) {
+      const confirmed = confirm(
+        `${newName} is already added to phonebook, replate the old number with a new one?`
+      );
+      if (confirmed) {
+        const personId = persons.find((p) => p.name === newName).id;
+        axiosService
+          .update(personId, { name: newName, number: newNumber })
+          .then((data) => {
+            setPersons(persons.map((p) => (p.id !== data.id ? p : data)));
+          });
+      } else {
+        axiosService
+          .create({ name: newName, number: newNumber })
+          .then((data) => {
+            setPersons(persons.concat(data));
+          });
+      }
+    }
     setNewName("");
     setNewNumber("");
+  };
+
+  const handleDelete = (id) => {
+    axiosService.deletePerson(id).then(() => {
+      setPersons(persons.filter((p) => p.id !== id));
+    });
   };
 
   return (
@@ -97,7 +133,13 @@ const App = () => {
         handleSubmit={handleSubmit}
       />
       <h2>Numbers</h2>
-      {persons ? <Persons persons={persons} filter={filter} /> : null}
+      {persons ? (
+        <Persons
+          persons={persons}
+          filter={filter}
+          handleDelete={handleDelete}
+        />
+      ) : null}
     </div>
   );
 };
