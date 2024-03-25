@@ -65,11 +65,32 @@ const Persons = ({ persons, filter, handleDelete }) => {
       });
 };
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        background: "grey",
+        border: message.error ? "5px solid red" : "5px solid green",
+        borderRadius: "5px",
+        color: message.error ? "red" : "green",
+        fontSize: "20px",
+      }}
+    >
+      <p>{message.message}</p>
+    </div>
+  );
+};
+
 const App = () => {
   const [persons, setPersons] = useState();
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     axiosService.getAll().then((data) => {
@@ -91,6 +112,7 @@ const App = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    let timer = null;
     if (persons.findIndex((person) => person.name === newName) !== -1) {
       const confirmed = confirm(
         `${newName} is already added to phonebook, replate the old number with a new one?`
@@ -101,14 +123,27 @@ const App = () => {
           .update(personId, { name: newName, number: newNumber })
           .then((data) => {
             setPersons(persons.map((p) => (p.id !== data.id ? p : data)));
-          });
-      } else {
-        axiosService
-          .create({ name: newName, number: newNumber })
-          .then((data) => {
-            setPersons(persons.concat(data));
+          })
+          .catch(() => {
+            setMessage({
+              message: `Information of ${newName} has already been removed from server`,
+              error: true,
+            });
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+              setMessage(null);
+            }, 5000);
           });
       }
+    } else {
+      axiosService.create({ name: newName, number: newNumber }).then((data) => {
+        setPersons(persons.concat(data));
+        setMessage({ message: `Added ${newName}`, error: false });
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      });
     }
     setNewName("");
     setNewNumber("");
@@ -123,6 +158,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter filter={filter} handleFilter={handleFilter} />
       <h2>Add a new</h2>
       <PersonForm
