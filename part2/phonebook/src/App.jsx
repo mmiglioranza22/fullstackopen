@@ -115,7 +115,7 @@ const App = () => {
     let timer = null;
     if (persons.findIndex((person) => person.name === newName) !== -1) {
       const confirmed = confirm(
-        `${newName} is already added to phonebook, replate the old number with a new one?`
+        `${newName} is already added to phonebook, replace the old number with a new one?`
       );
       if (confirmed) {
         const personId = persons.find((p) => p.name === newName).id;
