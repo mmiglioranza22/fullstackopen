@@ -3,6 +3,7 @@ const app = express();
 const morgan = require("morgan");
 const cors = require("cors");
 const blogRouter = require("./controllers/blogs");
+require("./mongoose_db");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
