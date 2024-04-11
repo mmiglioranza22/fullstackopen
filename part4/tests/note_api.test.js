@@ -1,4 +1,5 @@
 const { describe, it, after, beforeEach } = require("node:test");
+const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
@@ -36,8 +37,39 @@ describe("api", () => {
     await api
       .get("/api/blogs")
       .expect(200)
+      .expect((res) => {
+        assert.strictEqual(res.body.length, initialBlogs.length);
+      })
       .expect("Content-Type", /application\/json/);
   });
+  it("_id prop exists in each blog from DB", async () => {
+    await api.get("/api/blogs").expect((res) => {
+      res.body.forEach((doc) => {
+        assert.ok(doc._id);
+      });
+    });
+  });
+
+  it("_id prop exists in each blog from DB", async () => {
+    const newBlog = {
+      title: "new",
+      author: "blog",
+      url: "123",
+      likes: 1,
+    };
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect((res) => {
+        assert.ok(res.body._id);
+        assert.strictEqual(res.body.title, newBlog.title);
+        assert.strictEqual(res.body.author, newBlog.author);
+      });
+    await api.get("/api/blogs").expect((res) => {
+      assert.strictEqual(res.body.length, 4);
+    });
+  });
+
   after(async () => {
     await mongoose.connection.close();
   });
