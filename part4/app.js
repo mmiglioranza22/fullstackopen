@@ -14,6 +14,9 @@ app.use("/api/blogs", blogRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  if (err.name === "ValidationError") {
+    return res.status(400).send({ message: err.message });
+  }
   res.status(500).send("Something broke!");
 });
 

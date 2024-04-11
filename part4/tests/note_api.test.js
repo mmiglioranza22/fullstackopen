@@ -50,7 +50,7 @@ describe("api", () => {
     });
   });
 
-  it("_id prop exists in each blog from DB", async () => {
+  it("creates a new post correctly in DB", async () => {
     const newBlog = {
       title: "new",
       author: "blog",
@@ -68,6 +68,56 @@ describe("api", () => {
     await api.get("/api/blogs").expect((res) => {
       assert.strictEqual(res.body.length, 4);
     });
+  });
+
+  it("likes default set to 0 when not passed in body payload", async () => {
+    const newBlog = {
+      title: "no",
+      author: "likes",
+      url: "no likes",
+    };
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect((res) => {
+        assert.ok(res.body._id);
+        assert.strictEqual(res.body.title, newBlog.title);
+        assert.strictEqual(res.body.author, newBlog.author);
+        assert.strictEqual(res.body.likes, 0);
+      });
+  });
+  it("return error if title or author are not sent in payload", async () => {
+    const newBlog = {
+      url: "no author nor title",
+    };
+    await api.post("/api/blogs").send(newBlog).expect(400);
+    const noTitle = {
+      author: "no title",
+    };
+    await api
+      .post("/api/blogs")
+      .send(noTitle)
+      .expect(400)
+      .expect((res) => {
+        assert.strictEqual(
+          true,
+          res.body.message.includes("Path `title` is required")
+        );
+      });
+
+    const noAuthor = {
+      title: "no author",
+    };
+    await api
+      .post("/api/blogs")
+      .send(noAuthor)
+      .expect(400)
+      .expect((res) => {
+        assert.strictEqual(
+          true,
+          res.body.message.includes("Path `author` is required")
+        );
+      });
   });
 
   after(async () => {
