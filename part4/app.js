@@ -7,13 +7,25 @@ const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
 require("./mongoose_db");
 
+const tokenMiddleware = (request, response, next) => {
+  const authorization = request.get("authorization");
+  if (authorization && authorization.startsWith("Bearer ")) {
+    request.token = authorization.replace("Bearer ", "");
+    next();
+  } else {
+    // else required to avoid Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    next();
+  }
+};
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use("/api/login", loginRouter);
+app.use(tokenMiddleware);
 app.use("/api/users", usersRouter);
+app.use("/api/login", loginRouter);
 app.use("/api/blogs", blogRouter);
 
 app.use((err, req, res, next) => {
