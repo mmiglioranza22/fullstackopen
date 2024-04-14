@@ -2,9 +2,11 @@ const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const blogRouter = require("./controllers/blogs");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
+
 require("./mongoose_db");
 
 const tokenMiddleware = (request, response, next) => {
@@ -18,6 +20,16 @@ const tokenMiddleware = (request, response, next) => {
   }
 };
 
+const userCheckMiddleware = (request, response, next) => {
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token invalid" });
+  } else {
+    request.userId = decodedToken.id;
+    next();
+  }
+};
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -26,7 +38,7 @@ app.use(morgan("dev"));
 app.use(tokenMiddleware);
 app.use("/api/users", usersRouter);
 app.use("/api/login", loginRouter);
-app.use("/api/blogs", blogRouter);
+app.use("/api/blogs", userCheckMiddleware, blogRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

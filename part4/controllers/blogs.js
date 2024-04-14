@@ -18,11 +18,7 @@ blogRouter.get("/", async (request, response, next) => {
 
 blogRouter.post("/", async (request, response, next) => {
   try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET);
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: "token invalid" });
-    }
-    const user = await User.findById(decodedToken.id);
+    const user = await User.findById(request.userId);
     const payload = { ...request.body, user: user.id };
     const blog = await new Blog(payload).save();
 
@@ -37,17 +33,22 @@ blogRouter.post("/", async (request, response, next) => {
 
 blogRouter.delete("/:id", async (request, response, next) => {
   try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET);
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: "token invalid" });
+    const [user, blog] = await Promise.all([
+      User.findById(request.userId),
+      Blog.findById(request.params.id),
+    ]);
+
+    if (blog.user.toString() === user.id) {
+      await Blog.findByIdAndDelete(request.params.id);
+      user.blogs = user.blogs.filter((blog) => blog._id !== request.params.id);
+      await user.save();
+
+      response.status(204).send();
+    } else {
+      response.status(403).json({
+        error: `user is not the creator of the blog and can't delete it`,
+      });
     }
-    const user = await User.findById(decodedToken.id);
-    await Blog.findByIdAndDelete(request.params.id);
-
-    user.blogs = user.blogs.filter((blog) => blog._id !== request.params.id);
-    await user.save();
-
-    response.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -55,28 +56,33 @@ blogRouter.delete("/:id", async (request, response, next) => {
 
 blogRouter.patch("/:id", async (request, response, next) => {
   try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET);
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: "token invalid" });
-    }
-    const user = await User.findById(decodedToken.id);
+    const [user, blog] = await Promise.all([
+      User.findById(request.userId),
+      Blog.findById(request.params.id),
+    ]);
 
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      request.params.id,
-      request.body,
-      {
-        new: true,
-      }
-    );
-    user.blogs = user.blogs.map((blog) => {
-      if (blog._id === request.params.id) {
-        return updatedBlog;
-      } else {
-        return blog;
-      }
-    });
-    await user.save();
-    response.status(200).json(updatedBlog);
+    if (blog.user.toString() === user.id) {
+      const updatedBlog = await Blog.findByIdAndUpdate(
+        request.params.id,
+        request.body,
+        {
+          new: true,
+        }
+      );
+      user.blogs = user.blogs.map((blog) => {
+        if (blog._id === request.params.id) {
+          return updatedBlog;
+        } else {
+          return blog;
+        }
+      });
+      await user.save();
+      response.status(200).json(updatedBlog);
+    } else {
+      response.status(403).json({
+        error: `user is not the creator of the blog and can't delete it`,
+      });
+    }
   } catch (error) {
     next(error);
   }
