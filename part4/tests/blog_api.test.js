@@ -35,13 +35,25 @@ const initialBlogs = [
 
 describe("API tests suite - BLOGS:", () => {
   beforeEach(async () => {
+    await User.deleteMany({});
     await Blog.deleteMany({});
     await Promise.all(initialBlogs.map((blog) => new Blog(blog).save()));
+    const passwordHash = await generateHash(testUser.password);
+    await User.create({ ...testUser, passwordHash });
+    await api
+      .post("/api/login")
+      .send(testUser)
+      .expect(200)
+      .expect((res) => {
+        token = res.body.token;
+        userId = res.body.id;
+      });
   });
   describe("1- fetching posts", () => {
     it("fetches blogs correctly", async () => {
       await api
         .get("/api/blogs")
+        .auth(token, { type: "bearer" })
         .expect(200)
         .expect((res) => {
           assert.strictEqual(res.body.length, initialBlogs.length);
@@ -49,28 +61,18 @@ describe("API tests suite - BLOGS:", () => {
         .expect("Content-Type", /application\/json/);
     });
     it("_id prop exists in each blog from DB", async () => {
-      await api.get("/api/blogs").expect((res) => {
-        res.body.forEach((doc) => {
-          assert.ok(doc._id);
+      await api
+        .get("/api/blogs")
+        .auth(token, { type: "bearer" })
+        .expect((res) => {
+          res.body.forEach((doc) => {
+            assert.ok(doc._id);
+          });
         });
-      });
     });
   });
 
   describe("2- creating posts", () => {
-    before(async () => {
-      const passwordHash = await generateHash(testUser.password);
-      await User.create({ ...testUser, passwordHash });
-      await api
-        .post("/api/login")
-        .send(testUser)
-        .expect(200)
-        .expect((res) => {
-          token = res.body.token;
-          userId = res.body.id;
-        });
-    });
-
     it("creates a new post correctly in DB", async () => {
       const newBlog = {
         title: "new",
@@ -90,9 +92,12 @@ describe("API tests suite - BLOGS:", () => {
           assert.strictEqual(res.body.user, userId);
         });
 
-      await api.get("/api/blogs").expect((res) => {
-        assert.strictEqual(res.body.length, 4);
-      });
+      await api
+        .get("/api/blogs")
+        .auth(token, { type: "bearer" })
+        .expect((res) => {
+          assert.strictEqual(res.body.length, 4);
+        });
     });
     it("likes default set to 0 when not passed in body payload", async () => {
       const newBlog = {
@@ -146,40 +151,100 @@ describe("API tests suite - BLOGS:", () => {
         });
     });
   });
+
   describe("3- deleting posts", () => {
-    it("deletes a post correctly by its _id", async () => {
-      let id;
-      await api.get("/api/blogs").expect((res) => {
-        id = res.body[0]._id;
-      });
+    let blogId;
+    before(async () => {
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      await Promise.all(initialBlogs.map((blog) => new Blog(blog).save()));
+      const passwordHash = await generateHash(testUser.password);
+      await User.create({ ...testUser, passwordHash });
       await api
-        .delete(`/api/blogs/${id}`)
+        .post("/api/login")
+        .send(testUser)
+        .expect(200)
+        .expect((res) => {
+          token = res.body.token;
+          userId = res.body.id;
+        });
+    });
+    it("deletes a post correctly by its _id", async () => {
+      const newBlog = {
+        title: "new",
+        author: "blog",
+        url: "123",
+        likes: 1,
+      };
+
+      await api
+        .post("/api/blogs")
+        .auth(token, { type: "bearer" })
+        .send(newBlog)
+        .expect((res) => {
+          blogId = res.body._id.toString();
+        });
+      await api
+        .delete(`/api/blogs/${blogId}`)
         .auth(token, { type: "bearer" })
         .expect(204);
-      await api.get("/api/blogs").expect((res) => {
-        assert.strictEqual(res.body.length, initialBlogs.length - 1);
-      });
+      await api
+        .get("/api/users")
+        .auth(token, { type: "bearer" })
+        .expect((res) => {
+          assert.strictEqual(res.body[0].blogs.length, 0);
+        });
     });
   });
   describe("4- updating posts", () => {
-    it("updates a post correctly by its _id", async () => {
-      let id;
-      let title = "updated title";
-
-      await api.get("/api/blogs").expect((res) => {
-        id = res.body[0]._id;
-      });
+    before(async () => {
+      await User.deleteMany({});
+      await Blog.deleteMany({});
+      await Promise.all(initialBlogs.map((blog) => new Blog(blog).save()));
+      const passwordHash = await generateHash(testUser.password);
+      await User.create({ ...testUser, passwordHash });
       await api
-        .patch(`/api/blogs/${id}`)
+        .post("/api/login")
+        .send(testUser)
+        .expect(200)
+        .expect((res) => {
+          token = res.body.token;
+          userId = res.body.id;
+        });
+    });
+    it("updates a post correctly by its _id", async () => {
+      let blogId;
+      let title = "updated title";
+      const newBlog = {
+        title: "new",
+        author: "blog",
+        url: "123",
+        likes: 1,
+      };
+
+      await api
+        .post("/api/blogs")
+        .auth(token, { type: "bearer" })
+        .send(newBlog)
+        .expect((res) => {
+          blogId = res.body._id.toString();
+        });
+
+      await api
+        .patch(`/api/blogs/${blogId}`)
         .auth(token, { type: "bearer" })
         .send({ title: title })
         .expect(200)
         .expect((res) => {
           assert.strictEqual(res.body.title, title);
         });
-      await api.get("/api/blogs").expect((res) => {
-        assert.strictEqual(res.body.length, initialBlogs.length);
-      });
+      await api
+        .get("/api/users")
+        .auth(token, { type: "bearer" })
+        .expect((res) => {
+          assert.strictEqual(res.body[0].blogs.length, 1);
+          assert.strictEqual(res.body[0].blogs[0]._id.toString(), blogId);
+        });
     });
   });
 

@@ -24,6 +24,7 @@ blogRouter.post("/", async (request, response, next) => {
 
     user.blogs = user.blogs.concat(blog._id);
     await user.save();
+    console.log({ userblogs: user.blogs });
 
     response.status(201).json(blog);
   } catch (error) {
@@ -37,8 +38,9 @@ blogRouter.delete("/:id", async (request, response, next) => {
       User.findById(request.userId),
       Blog.findById(request.params.id),
     ]);
+    console.log({ user, blog });
 
-    if (blog.user.toString() === user.id) {
+    if (blog?.user.toString() === user.id.toString()) {
       await Blog.findByIdAndDelete(request.params.id);
       user.blogs = user.blogs.filter((blog) => blog._id !== request.params.id);
       await user.save();
@@ -61,7 +63,7 @@ blogRouter.patch("/:id", async (request, response, next) => {
       Blog.findById(request.params.id),
     ]);
 
-    if (blog.user.toString() === user.id) {
+    if (blog?.user.toString() === user.id.toString()) {
       const updatedBlog = await Blog.findByIdAndUpdate(
         request.params.id,
         request.body,
