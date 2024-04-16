@@ -45,7 +45,7 @@ app.use((err, req, res, next) => {
   if (err.name === "ValidationError") {
     return res.status(400).send({ message: err.message });
   } else if (err.name === "JsonWebTokenError") {
-    return response.status(401).json({ error: "token invalid" });
+    return res.status(401).json({ error: "token invalid" });
   } else if (
     err.name === "MongoServerError" &&
     err.message.includes("E11000 duplicate key error")
