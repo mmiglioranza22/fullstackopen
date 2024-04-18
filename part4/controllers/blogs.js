@@ -37,7 +37,6 @@ blogRouter.delete("/:id", async (request, response, next) => {
       User.findById(request.userId),
       Blog.findById(request.params.id),
     ]);
-    console.log({ user, blog });
 
     if (blog?.user.toString() === user.id.toString()) {
       await Blog.findByIdAndDelete(request.params.id);
@@ -69,7 +68,9 @@ blogRouter.patch("/:id", async (request, response, next) => {
         {
           new: true,
         }
-      );
+      ).populate("user", {
+        name: 1,
+      });
       user.blogs = user.blogs.map((blog) => {
         if (blog._id === request.params.id) {
           return updatedBlog;
