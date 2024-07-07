@@ -15,7 +15,7 @@ const tokenMiddleware = (request, response, next) => {
     request.token = authorization.replace("Bearer ", "");
     next();
   } else {
-    // else required to avoid Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    // else required to avoid Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client  
     next();
   }
 };
