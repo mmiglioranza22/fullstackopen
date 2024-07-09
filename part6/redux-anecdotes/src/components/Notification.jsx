@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { clearNotification } from "../reducers/notificationReducer";
 
 const Notification = () => {
   const notification = useSelector((state) => state.notification.notification);
@@ -17,7 +16,6 @@ const Notification = () => {
       setStyle((prev) => ({ ...prev, display: "flex" }));
       timer = setTimeout(() => {
         setStyle((prev) => ({ ...prev, display: "none" }));
-        clearNotification();
       }, 5000);
     }
     return () => clearTimeout(timer);

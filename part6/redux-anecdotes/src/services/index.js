@@ -13,4 +13,10 @@ const createNew = async (content) => {
   return response.data;
 };
 
-export default { getAll, createNew };
+// https://stackoverflow.com/questions/67240984/how-to-update-an-object-using-axios-and-json-server-in-a-react-hooks-project
+const voteAnecdote = async (anecdote) => {
+  const response = await axios.patch(`${baseUrl}/${anecdote.id}`, anecdote);
+  return response.data;
+};
+
+export default { getAll, createNew, voteAnecdote };
