@@ -30,9 +30,6 @@ const App = () => {
   const [notification, setNotification] = useState("");
 
   let timer;
-  useEffect(() => {
-    return () => clearTimeout(timer);
-  }, [notification]);
 
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000);
@@ -40,6 +37,10 @@ const App = () => {
     setNotification("a new anecdote " + anecdote.content + " was created!");
     timer = setTimeout(() => setNotification(""), 5000);
   };
+
+  useEffect(() => {
+    clearTimeout(timer);
+  }, [notification]);
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
 
