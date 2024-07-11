@@ -21,7 +21,10 @@ describe("API tests suite LOGIN:", () => {
     it("logins correctly a preloaded user", async () => {
       await api
         .post("/api/login")
-        .send({ username: testUser.username, password: testUser.password })
+        .send({
+          username: testUser.username,
+          password: testUser.password,
+        })
         .expect(200)
         .expect((res) => {
           assert.ok(res.body.token);

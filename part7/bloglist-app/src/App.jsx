@@ -123,7 +123,13 @@ const App = () => {
         </>
       ) : (
         <>
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "4px",
+            }}
+          >
             <p>{user.name} logged in</p>
             <button style={{ width: "fit-content" }} onClick={handleLogout}>
               log out
