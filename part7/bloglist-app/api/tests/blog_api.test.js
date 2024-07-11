@@ -50,7 +50,7 @@ describe("API tests suite - BLOGS:", () => {
     await Promise.all(
       initialBlogs
         .map((blog) => ({ ...blog, user: userId }))
-        .map((blog) => new Blog(blog).save())
+        .map((blog) => new Blog(blog).save()),
     );
   });
   describe("1- fetching posts", () => {

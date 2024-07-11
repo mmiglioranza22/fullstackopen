@@ -25,7 +25,7 @@ const App = () => {
       blogService
         .getAll()
         .then((blogs) =>
-          setBlogs(blogs.sort((a, b) => (a.likes < b.likes ? 1 : -1)))
+          setBlogs(blogs.sort((a, b) => (a.likes < b.likes ? 1 : -1))),
         );
     }
   }, [user]);
@@ -67,7 +67,7 @@ const App = () => {
         setBlogs((prev) =>
           [...prev]
             .concat(response)
-            .sort((a, b) => (a.likes < b.likes ? 1 : -1))
+            .sort((a, b) => (a.likes < b.likes ? 1 : -1)),
         );
         setMessage({
           message: `${response.title} by ${user.name} added`,

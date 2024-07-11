@@ -30,7 +30,7 @@ const mostBlogs = (blogs) => {
     };
   });
   return orderedMostBlogsAuthors.reduce((acc, author) =>
-    acc.blogs > author.blogs ? acc : author
+    acc.blogs > author.blogs ? acc : author,
   );
 };
 
@@ -56,7 +56,7 @@ const mostLikes = (blogs) => {
   // If there are 2 or more authors with same number of likes, the last one is returned
   // since reduce loops until the end of the array and no conditions is being placed to handle this (return the previous in case of equality)
   return orderedMostLikedAuthors.reduce((acc, author) =>
-    acc.likes > author.likes ? acc : author
+    acc.likes > author.likes ? acc : author,
   );
 };
 

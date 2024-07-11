@@ -85,7 +85,7 @@ describe("API tests suite - USERS:", () => {
         .expect(400)
         .expect((res) => {
           assert(
-            res.body.message.includes("name must be at leat 3 characters long")
+            res.body.message.includes("name must be at leat 3 characters long"),
           );
         });
       const invalidUsername = {
@@ -100,8 +100,8 @@ describe("API tests suite - USERS:", () => {
         .expect((res) => {
           assert(
             res.body.message.includes(
-              "username must be at leat 3 characters long"
-            )
+              "username must be at leat 3 characters long",
+            ),
           );
         });
       await api

@@ -66,7 +66,7 @@ describe("Blog app", () => {
       await fillLoginFormAndLogin(page, fakeUser);
 
       const errorNotification = await page.getByText(
-        "invalid username or password"
+        "invalid username or password",
       );
       const loginButton = await page.getByTestId("button-submit");
 
@@ -83,13 +83,13 @@ describe("Blog app", () => {
         await createBlog(page, newBlog);
 
         const successNotification = await page.getByText(
-          `${newBlog.title} by ${testUser.name} added`
+          `${newBlog.title} by ${testUser.name} added`,
         );
 
         await expect(successNotification).toBeVisible();
         await expect(page.getByTestId("hideWhenVisible-button")).toBeVisible();
         await expect(
-          page.getByText(`${newBlog.title} ${newBlog.author}`)
+          page.getByText(`${newBlog.title} ${newBlog.author}`),
         ).toBeVisible();
       });
 
@@ -118,7 +118,7 @@ describe("Blog app", () => {
         await page.getByTestId("remove-btn").click();
 
         await expect(
-          page.getByText(`${newBlog.title} ${newBlog.author}`)
+          page.getByText(`${newBlog.title} ${newBlog.author}`),
         ).toBeHidden();
       });
     });

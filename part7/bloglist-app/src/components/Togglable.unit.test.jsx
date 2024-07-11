@@ -14,7 +14,7 @@ describe("<Togglable />", () => {
     render(
       <Togglable buttonLabel="buttonLabel" ref={ref}>
         {child}
-      </Togglable>
+      </Togglable>,
     );
 
     const hideWhenVisibleDiv = screen.getByTestId("hideWhenVisible-div");
@@ -36,7 +36,7 @@ describe("<Togglable />", () => {
     render(
       <Togglable buttonLabel="buttonLabel" ref={ref}>
         {child}
-      </Togglable>
+      </Togglable>,
     );
 
     const hideWhenVisibleDiv = screen.getByTestId("hideWhenVisible-div");

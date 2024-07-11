@@ -67,7 +67,7 @@ blogRouter.patch("/:id", async (request, response, next) => {
         request.body,
         {
           new: true,
-        }
+        },
       ).populate("user", {
         name: 1,
       });

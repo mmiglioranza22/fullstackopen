@@ -1,0 +1,10 @@
+# Ignore artifacts:
+dist
+build
+coverage
+test-results
+node_modules
+playwright-report
+.env
+
+api/node_modules
