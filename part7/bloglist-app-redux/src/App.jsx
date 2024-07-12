@@ -14,8 +14,6 @@ const App = () => {
   const user = useSelector((state) => state.user);
   const blogs = useSelector((state) => state.blogs);
 
-  const [message, setMessage] = useState(null);
-
   useEffect(() => {
     const loggedUser = window.localStorage.getItem("loggedUser");
     if (loggedUser) {
@@ -38,59 +36,12 @@ const App = () => {
     dispatch(clearUser());
   };
 
-  const handleBlogService = (loginData) => {
-    let timer;
-    blogService
-      .login(loginData)
-      .then((response) => {
-        blogService.setToken(response.token);
-        window.localStorage.setItem("loggedUser", JSON.stringify(response));
-      })
-      .catch((err) => {
-        setMessage({
-          message: `${err.response.data.error}`,
-          error: true,
-        });
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-      });
-  };
-
-  // Post blog logic ----
+  // Post blog logic toggle ----
   const blogRef = useRef();
-
-  const createBlog = (newBlog) => {
-    let timer;
-    blogService
-      .create(newBlog)
-      .then((response) => {
-        setMessage({
-          message: `${response.title} by ${user.name} added`,
-        });
-        blogRef.current.toggleVisibility();
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-      })
-      .catch((err) => {
-        setMessage({
-          message: `${err.response.data.message}`,
-          error: true,
-        });
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-      });
-  };
-  console.log({ blogs });
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      <Notification message={message} />
+      <Notification />
       <h2>blogs</h2>
       {!user ? (
         <>
@@ -111,7 +62,7 @@ const App = () => {
               log out
             </button>
             <Togglable buttonLabel="Create blog" ref={blogRef}>
-              <BlogForm />
+              <BlogForm close={() => blogRef.current.toggleVisibility()} />
             </Togglable>
             {blogs && blogs.length > 0 ? (
               blogs.map((blog, i) => (

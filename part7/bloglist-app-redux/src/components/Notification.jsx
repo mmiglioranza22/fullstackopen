@@ -1,5 +1,22 @@
-const Notification = ({ message }) => {
-  if (message === null) {
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { clearNotification } from "../redux/reducers/notificationReducer";
+
+const Notification = () => {
+  const notification = useSelector((state) => state.notification);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    let timer;
+    if (notification) {
+      timer = setTimeout(() => {
+        dispatch(clearNotification());
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [notification]);
+
+  if (!notification) {
     return null;
   }
 
@@ -8,13 +25,13 @@ const Notification = ({ message }) => {
       data-testid="notification"
       style={{
         background: "grey",
-        border: message.error ? "5px solid red" : "5px solid green",
+        border: notification.error ? "5px solid red" : "5px solid green",
         borderRadius: "5px",
-        color: message.error ? "red" : "green",
+        color: notification.error ? "red" : "green",
         fontSize: "20px",
       }}
     >
-      <p>{message.message}</p>
+      <p>{notification.message}</p>
     </div>
   );
 };

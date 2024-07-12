@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { postBlog } from "../redux/reducers/blogReducer";
 
-const BlogForm = () => {
+const BlogForm = ({ close }) => {
   const dispatch = useDispatch();
   const [newBlog, setNewBlog] = useState({ author: "", title: "", url: "" });
 
@@ -18,6 +18,7 @@ const BlogForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(postBlog(newBlog));
+    close();
   };
 
   return (

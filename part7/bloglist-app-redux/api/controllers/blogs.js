@@ -43,7 +43,7 @@ blogRouter.delete("/:id", async (request, response, next) => {
       user.blogs = user.blogs.filter((blog) => blog._id !== request.params.id);
       await user.save();
 
-      response.status(200).json({ blogDeleted: request.params.id });
+      response.status(200).json({ _id: request.params.id });
     } else {
       response.status(403).json({
         error: "user is not the creator of the blog and can't delete it",

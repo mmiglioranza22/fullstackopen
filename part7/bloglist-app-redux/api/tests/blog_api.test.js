@@ -193,7 +193,7 @@ describe("API tests suite - BLOGS:", () => {
         .auth(token, { type: "bearer" })
         .expect(200)
         .expect((res) => {
-          assert.strictEqual(res.body.blogDeleted, blogId);
+          assert.strictEqual(res.body._id, blogId);
         });
       await api
         .get("/api/users")
