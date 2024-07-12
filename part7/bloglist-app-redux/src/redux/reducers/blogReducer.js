@@ -8,8 +8,8 @@ const blogReducer = createSlice({
   name: "blogs",
   initialState,
   reducers: {
-    initializeBlogs(state) {
-      return state;
+    initializeBlogs(_state, action) {
+      return action.payload;
     },
     newBlog(state, action) {
       return state.concat(action.payload);

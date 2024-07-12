@@ -86,6 +86,7 @@ const App = () => {
         }, 5000);
       });
   };
+  console.log({ blogs });
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
