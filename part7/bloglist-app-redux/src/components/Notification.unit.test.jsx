@@ -1,18 +1,26 @@
 import { render, screen } from "@testing-library/react";
 import { expect, describe } from "vitest";
 import Notification from "./Notification";
+import { setupStore } from "../redux/store";
+import { setNotification } from "../redux/reducers/notificationReducer";
+import { renderWithProviders } from "../utils/redux-test-utils";
 
+// let store = null;
 describe("<Notification />", () => {
   test("debug", () => {});
-
+  // beforeEach(() => {
+  //   const initialState = null;
+  //   store = setupStore(initialState);
+  // });
   // test("renders nothing if message is null", () => {
   //   // GIVEN
-  //   const message = {
-  //     error: null,
-  //     message: null,
-  //   };
+  //   const message = null;
   //   // WHEN
-  //   const { container } = render(<Notification message={null} />);
+  //   // WHEN
+  //   store.dispatch(setNotification(message));
+  //   const { container } = renderWithProviders(<Notification />, { store });
+  //   screen.debug();
+  //   // = render(<Notification />);
   //   // EXPECT
   //   expect(container).toBeEmptyDOMElement();
   // });
