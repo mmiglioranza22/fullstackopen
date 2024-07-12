@@ -1,20 +1,25 @@
 import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
-import blogService from "./services/blogs";
+import blogService from "./services/blogService";
 import BlogForm from "./components/BlogForm";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUser, setUser } from "./redux/reducers/userReducer";
+import { fetchAllBlogs } from "./redux/reducers/blogReducer";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const blogs = useSelector((state) => state.blogs);
+
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
     const loggedUser = window.localStorage.getItem("loggedUser");
     if (loggedUser) {
-      setUser(JSON.parse(loggedUser));
+      dispatch(setUser(JSON.parse(loggedUser)));
       blogService.setToken(JSON.parse(loggedUser)?.token);
     }
   }, []);
@@ -22,17 +27,15 @@ const App = () => {
   useEffect(() => {
     // should bring only those blogs related to the user
     if (user) {
-      blogService
-        .getAll()
-        .then((blogs) =>
-          setBlogs(blogs.sort((a, b) => (a.likes < b.likes ? 1 : -1))),
-        );
+      blogService.setToken(user.token);
+      window.localStorage.setItem("loggedUser", JSON.stringify(user));
+      dispatch(fetchAllBlogs());
     }
   }, [user]);
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedUser");
-    setUser(null);
+    dispatch(clearUser());
   };
 
   const handleBlogService = (loginData) => {
@@ -42,7 +45,6 @@ const App = () => {
       .then((response) => {
         blogService.setToken(response.token);
         window.localStorage.setItem("loggedUser", JSON.stringify(response));
-        setUser(response);
       })
       .catch((err) => {
         setMessage({
@@ -64,11 +66,6 @@ const App = () => {
     blogService
       .create(newBlog)
       .then((response) => {
-        setBlogs((prev) =>
-          [...prev]
-            .concat(response)
-            .sort((a, b) => (a.likes < b.likes ? 1 : -1)),
-        );
         setMessage({
           message: `${response.title} by ${user.name} added`,
         });
@@ -90,28 +87,6 @@ const App = () => {
       });
   };
 
-  const updateBlog = (blogId, payload) => {
-    blogService
-      .update(blogId, payload)
-      .then((response) => {
-        setBlogs(blogs.map((blog) => (blog._id === blogId ? response : blog)));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
-  const removeBlog = (blogId) => {
-    blogService
-      .remove(blogId)
-      .then((response) => {
-        setBlogs(blogs.filter((blog) => blog._id !== blogId));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <Notification message={message} />
@@ -119,7 +94,7 @@ const App = () => {
       {!user ? (
         <>
           <h2>login to application</h2>
-          <LoginForm handleBlogService={handleBlogService} />
+          <LoginForm />
         </>
       ) : (
         <>
@@ -135,16 +110,15 @@ const App = () => {
               log out
             </button>
             <Togglable buttonLabel="Create blog" ref={blogRef}>
-              <BlogForm createBlog={createBlog} />
+              <BlogForm />
             </Togglable>
-            {blogs.map((blog, i) => (
-              <Blog
-                key={blog.id + "-" + i}
-                blog={blog}
-                updateBlog={updateBlog}
-                removeBlog={removeBlog}
-              />
-            ))}
+            {blogs && blogs.length > 0 ? (
+              blogs.map((blog, i) => (
+                <Blog key={blog.id + "-" + i} blog={blog} />
+              ))
+            ) : (
+              <p>No blogs</p>
+            )}
           </div>
         </>
       )}

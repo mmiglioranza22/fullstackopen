@@ -3,6 +3,10 @@ import { expect, describe, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import LoginForm from "./LoginForm";
 
+import { Provider } from "react-redux";
+
+//https://medium.com/@vitalismutwiri/an-interactive-guide-to-integration-testing-of-redux-with-testing-library-1c22849792ab
+// https://www.freecodecamp.org/news/how-to-write-unit-tests-in-react-redux/
 describe("<LoginForm />", () => {
   test("renders form and inserts values for username and password correctly", async () => {
     // GIVEN

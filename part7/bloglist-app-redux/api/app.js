@@ -44,6 +44,7 @@ if (process.env.NODE_ENV === "test") {
   app.use("/api/testing", testingRouter);
 }
 
+// any specific approach for redux-aware FE ?
 app.use((err, req, res, next) => {
   console.error(err.stack);
   if (err.name === "ValidationError") {

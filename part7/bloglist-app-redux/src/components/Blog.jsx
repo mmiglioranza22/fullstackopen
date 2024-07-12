@@ -1,15 +1,18 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { removeBlog, updateBlog } from "../redux/reducers/blogReducer";
 
-const Blog = ({ blog, updateBlog, removeBlog }) => {
+const Blog = ({ blog }) => {
+  const dispatch = useDispatch();
   const [toggleDetail, setToggleDetail] = useState(false);
 
   const handleUpdateBlog = () => {
-    updateBlog(blog._id, { likes: blog.likes + 1 });
+    dispatch(updateBlog(blog._id, { likes: blog.likes + 1 }));
   };
 
   const handleRemoveBlog = () => {
     if (window.confirm(`Remove blog ${blog.title} ${blog.author}?`)) {
-      removeBlog(blog._id);
+      dispatch(removeBlog(blog._id));
     }
   };
 

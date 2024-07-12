@@ -191,7 +191,10 @@ describe("API tests suite - BLOGS:", () => {
       await api
         .delete(`/api/blogs/${blogId}`)
         .auth(token, { type: "bearer" })
-        .expect(204);
+        .expect(200)
+        .expect((res) => {
+          assert.strictEqual(res.body.blogDeleted, blogId);
+        });
       await api
         .get("/api/users")
         .auth(token, { type: "bearer" })

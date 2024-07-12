@@ -15,11 +15,6 @@ const getAll = () => {
   return request.then((response) => response.data);
 };
 
-const login = (payload) => {
-  const request = axios.post("/api/login", payload);
-  return request.then((response) => response.data);
-};
-
 const create = (payload) => {
   const config = {
     headers: { Authorization: token },
@@ -36,7 +31,7 @@ const update = (blogId, payload) => {
   return request.then((response) => response.data);
 };
 
-const remove = (blogId, payload) => {
+const remove = (blogId) => {
   const config = {
     headers: { Authorization: token },
   };
@@ -44,4 +39,4 @@ const remove = (blogId, payload) => {
   return request.then((response) => response.data);
 };
 
-export default { getAll, login, setToken, create, update, remove };
+export default { getAll, setToken, create, update, remove };

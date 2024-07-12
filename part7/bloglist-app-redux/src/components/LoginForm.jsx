@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../redux/reducers/userReducer";
 
-const LoginForm = ({ handleBlogService }) => {
+const LoginForm = () => {
+  const dispatch = useDispatch();
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const handleChangeLoginForm = (ev) => {
     setLoginData((prev) => {
@@ -13,7 +16,7 @@ const LoginForm = ({ handleBlogService }) => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    handleBlogService(loginData);
+    dispatch(loginUser(loginData));
   };
 
   return (
