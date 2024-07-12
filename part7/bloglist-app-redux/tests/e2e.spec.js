@@ -83,7 +83,7 @@ describe("Blog app", () => {
         await createBlog(page, newBlog);
 
         const successNotification = await page.getByText(
-          `${newBlog.title} by ${testUser.name} added`,
+          `A new blog '${newBlog.title}' was added`,
         );
 
         await expect(successNotification).toBeVisible();

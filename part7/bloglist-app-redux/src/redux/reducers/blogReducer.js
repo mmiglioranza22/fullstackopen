@@ -83,6 +83,8 @@ export const updateBlog = (blog, payload) => {
         }),
       );
     } catch (err) {
+      console.log({ err });
+
       dispatch(
         setNotification({
           message: `${err.response.data.message}`,
