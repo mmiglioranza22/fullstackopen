@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../../services/blogService";
 import { setNotification } from "./notificationReducer";
+import { fetchUsers } from "./usersReducer";
 
 // handle errors how?
 
@@ -54,6 +55,8 @@ export const postBlog = (blog) => {
     try {
       const response = await blogService.create(blog);
       dispatch(newBlog(response));
+      // dispatch(fetchAllBlogs());
+      dispatch(fetchUsers());
       dispatch(
         setNotification({
           message: `A new blog '${response.title}' was added`,
@@ -87,7 +90,7 @@ export const updateBlog = (blog, payload) => {
 
       dispatch(
         setNotification({
-          message: `${err.response.data.message}`,
+          message: `${err.response.data.message ?? err.response.data.error}`,
           error: true,
         }),
       );

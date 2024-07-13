@@ -6,4 +6,9 @@ const login = async (payload) => {
   return request.data;
 };
 
-export default { login };
+const getAll = async (payload) => {
+  const request = await axios.get("/api/users", payload);
+  return request.data;
+};
+
+export default { login, getAll };

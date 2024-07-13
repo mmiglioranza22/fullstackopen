@@ -1,25 +1,39 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import {
+  Link,
+  Route,
+  Routes,
+  useMatch,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import Blog from "./components/Blog";
 import blogService from "./services/blogService";
 import BlogForm from "./components/BlogForm";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
-import { useDispatch, useSelector } from "react-redux";
-import { clearUser, setUser } from "./redux/reducers/userReducer";
-import { fetchAllBlogs } from "./redux/reducers/blogReducer";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import Home from "./views/Home";
+// import Home from "./views/Home";
 import UsersList from "./views/UsersList";
 import UserDetail from "./views/UserDetail";
 import BlogsList from "./views/BlogsList";
 import BlogDetail from "./views/BlogDetail";
 
+import { fetchUsers } from "./redux/reducers/usersReducer";
+import { clearUser, setUser } from "./redux/reducers/userReducer";
+import { fetchAllBlogs } from "./redux/reducers/blogReducer";
+
 const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
+  const loggedUser = useSelector((state) => state.loggedUser);
   const blogs = useSelector((state) => state.blogs);
+  const users = useSelector((state) => state.users);
+  // window.onpopstate = (ev) => {
+  //   navigate("/users");
+  // };
 
   useEffect(() => {
     const loggedUser = window.localStorage.getItem("loggedUser");
@@ -31,16 +45,21 @@ const App = () => {
 
   useEffect(() => {
     // should bring only those blogs related to the user
-    if (user) {
-      blogService.setToken(user.token);
-      window.localStorage.setItem("loggedUser", JSON.stringify(user));
+    if (loggedUser) {
+      blogService.setToken(loggedUser.token);
+      window.localStorage.setItem("loggedUser", JSON.stringify(loggedUser));
       dispatch(fetchAllBlogs());
+      dispatch(fetchUsers());
+
+      navigate("/users");
     }
-  }, [user]);
+  }, [loggedUser]);
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedUser");
     dispatch(clearUser());
+
+    navigate("/");
   };
 
   // Post blog logic toggle ----
@@ -49,8 +68,8 @@ const App = () => {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <Notification />
-      <h2>blogs</h2>
-      {!user ? (
+
+      {!loggedUser ? (
         <>
           <h2>login to application</h2>
           <LoginForm />
@@ -64,20 +83,39 @@ const App = () => {
               gap: "4px",
             }}
           >
-            <p>{user.name} logged in</p>
-            <button style={{ width: "fit-content" }} onClick={handleLogout}>
-              log out
-            </button>
+            <nav
+              style={{
+                display: "flex",
+                gap: "8px",
+                alignItems: "center",
+                paddingLeft: "8px",
+                backgroundColor: "lightgrey",
+              }}
+            >
+              {/* <Link to="/">Home</Link> */}
+              <Link to="/blogs">Blogs</Link>
+              <Link to="/users">Users</Link>
+              <p>{loggedUser.name} logged in</p>
+              <button style={{ width: "fit-content" }} onClick={handleLogout}>
+                log out
+              </button>
+            </nav>
+            <h2>blog app</h2>
             <Togglable buttonLabel="Create blog" ref={blogRef}>
               <BlogForm close={() => blogRef.current.toggleVisibility()} />
             </Togglable>
             <Routes>
-              <Route path="/users/:id" element={<UserDetail />} />
-              <Route path="/blogs/:id" element={<BlogDetail />} />
+              <Route
+                path="/users/:userId"
+                element={<UserDetail users={users} />}
+              />
+              <Route
+                path="/blogs/:blogId"
+                element={<BlogDetail blogs={blogs} />}
+              />
               <Route path="/blogs" element={<BlogsList blogs={blogs} />} />
-              <Route path="/users" element={<UsersList />} />
-
-              <Route path="/" element={<Home />} />
+              <Route path="/users" element={<UsersList users={users} />} />
+              {/* <Route path="/" element={<Home />} /> */}
             </Routes>
           </div>
         </>

@@ -3,26 +3,26 @@ import userService from "../../services/userService";
 import { setNotification } from "./notificationReducer";
 
 const initialState = null;
-const userReducer = createSlice({
-  name: "loggedUser",
+const usersReducer = createSlice({
+  name: "users",
   initialState,
   reducers: {
-    setUser(_state, action) {
+    setUsers(_state, action) {
       return action.payload;
     },
-    clearUser() {
+    clearUsers() {
       return null;
     },
   },
 });
 
-export const { setUser, clearUser } = userReducer.actions;
+export const { setUsers, clearUsers } = usersReducer.actions;
 
-export const loginUser = (credentials) => {
+export const fetchUsers = () => {
   return async (dispatch) => {
     try {
-      const user = await userService.login(credentials);
-      dispatch(setUser(user));
+      const user = await userService.getAll();
+      dispatch(setUsers(user));
     } catch (err) {
       console.log(err);
       dispatch(
@@ -35,4 +35,4 @@ export const loginUser = (credentials) => {
   };
 };
 
-export default userReducer.reducer;
+export default usersReducer.reducer;
