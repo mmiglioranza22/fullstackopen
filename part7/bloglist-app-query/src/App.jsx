@@ -6,9 +6,14 @@ import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
 import UserContext from "./context/userContext";
+import { useGetBlogs, useGetUsers } from "./hooks";
 
 const App = () => {
-  const [user, dispatchUser] = useContext(UserContext);
+  const [userLogged, dispatchUser] = useContext(UserContext);
+
+  const { data: user } = useGetUsers();
+  const { data: blogs } = useGetBlogs();
+
   useEffect(() => {
     const loggedUser = window.localStorage.getItem("loggedUser");
     if (loggedUser) {
@@ -17,17 +22,18 @@ const App = () => {
       blogService.setToken(JSON.parse(loggedUser)?.token);
     }
   }, []);
+  console.log({ user, blogs });
 
-  useEffect(() => {
-    // should bring only those blogs related to the user
-    if (user) {
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   // should bring only those blogs related to the user
+  //   if (user) {
+  //   }
+  // }, [user]);
 
-  // const handleLogout = () => {
-  //   window.localStorage.removeItem("loggedUser");
-  //   setUser(null);
-  // };
+  const handleLogout = () => {
+    window.localStorage.removeItem("loggedUser");
+    //   setUser(null);
+  };
 
   // const handleBlogService = (loginData) => {
   //   let timer;
@@ -53,58 +59,58 @@ const App = () => {
   // Post blog logic ----
   const blogRef = useRef();
 
-  // const createBlog = (newBlog) => {
-  //   let timer;
-  //   blogService
-  //     .create(newBlog)
-  //     .then((response) => {
-  //       setBlogs((prev) =>
-  //         [...prev]
-  //           .concat(response)
-  //           .sort((a, b) => (a.likes < b.likes ? 1 : -1)),
-  //       );
-  //       setMessage({
-  //         message: `${response.title} by ${user.name} added`,
-  //       });
-  //       blogRef.current.toggleVisibility();
-  //       clearTimeout(timer);
-  //       timer = setTimeout(() => {
-  //         setMessage(null);
-  //       }, 5000);
-  //     })
-  //     .catch((err) => {
-  //       setMessage({
-  //         message: `${err.response.data.message}`,
-  //         error: true,
-  //       });
-  //       clearTimeout(timer);
-  //       timer = setTimeout(() => {
-  //         setMessage(null);
-  //       }, 5000);
-  //     });
-  // };
+  const createBlog = (newBlog) => {
+    //   let timer;
+    //   blogService
+    //     .create(newBlog)
+    //     .then((response) => {
+    //       setBlogs((prev) =>
+    //         [...prev]
+    //           .concat(response)
+    //           .sort((a, b) => (a.likes < b.likes ? 1 : -1)),
+    //       );
+    //       setMessage({
+    //         message: `${response.title} by ${user.name} added`,
+    //       });
+    //       blogRef.current.toggleVisibility();
+    //       clearTimeout(timer);
+    //       timer = setTimeout(() => {
+    //         setMessage(null);
+    //       }, 5000);
+    //     })
+    //     .catch((err) => {
+    //       setMessage({
+    //         message: `${err.response.data.message}`,
+    //         error: true,
+    //       });
+    //       clearTimeout(timer);
+    //       timer = setTimeout(() => {
+    //         setMessage(null);
+    //       }, 5000);
+    //     });
+  };
 
-  // const updateBlog = (blogId, payload) => {
-  //   blogService
-  //     .update(blogId, payload)
-  //     .then((response) => {
-  //       setBlogs(blogs.map((blog) => (blog._id === blogId ? response : blog)));
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-  // };
+  const updateBlog = (blogId, payload) => {
+    //   blogService
+    //     .update(blogId, payload)
+    //     .then((response) => {
+    //       setBlogs(blogs.map((blog) => (blog._id === blogId ? response : blog)));
+    //     })
+    //     .catch((err) => {
+    //       console.error(err);
+    //     });
+  };
 
-  // const removeBlog = (blogId) => {
-  //   blogService
-  //     .remove(blogId)
-  //     .then((response) => {
-  //       setBlogs(blogs.filter((blog) => blog._id !== blogId));
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-  // };
+  const removeBlog = (blogId) => {
+    //   blogService
+    //     .remove(blogId)
+    //     .then((response) => {
+    //       setBlogs(blogs.filter((blog) => blog._id !== blogId));
+    //     })
+    //     .catch((err) => {
+    //       console.error(err);
+    //     });
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>

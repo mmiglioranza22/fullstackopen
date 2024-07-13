@@ -8,8 +8,15 @@ import Togglable from "./components/Togglable";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUser, setUser } from "./redux/reducers/userReducer";
 import { fetchAllBlogs } from "./redux/reducers/blogReducer";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import Home from "./views/Home";
+import UsersList from "./views/UsersList";
+import UserDetail from "./views/UserDetail";
+import BlogsList from "./views/BlogsList";
+import BlogDetail from "./views/BlogDetail";
 
 const App = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const blogs = useSelector((state) => state.blogs);
@@ -64,13 +71,14 @@ const App = () => {
             <Togglable buttonLabel="Create blog" ref={blogRef}>
               <BlogForm close={() => blogRef.current.toggleVisibility()} />
             </Togglable>
-            {blogs && blogs.length > 0 ? (
-              blogs.map((blog, i) => (
-                <Blog key={blog.id + "-" + i} blog={blog} />
-              ))
-            ) : (
-              <p>No blogs</p>
-            )}
+            <Routes>
+              <Route path="/users/:id" element={<UserDetail />} />
+              <Route path="/blogs/:id" element={<BlogDetail />} />
+              <Route path="/blogs" element={<BlogsList blogs={blogs} />} />
+              <Route path="/users" element={<UsersList />} />
+
+              <Route path="/" element={<Home />} />
+            </Routes>
           </div>
         </>
       )}

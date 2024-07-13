@@ -8,7 +8,7 @@ export const useCreateBlog = () => {
   return useMutation({
     mutationFn: blogService.create,
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["blogs", "users"] });
       console.log({ response });
     },
     onError: (errorResponse) => {
@@ -44,7 +44,7 @@ export const useRemoveBlog = () => {
   return useMutation({
     mutationFn: blogService.remove,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["blogs", "users"] });
       console.log({ response });
     },
     onError: (errorResponse) => {
@@ -64,12 +64,10 @@ export const useGetBlogs = () => {
 };
 
 export const useLoginUser = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: userService.login,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["blogs", "users"] });
       console.log({ response });
     },
     onError: (errorResponse) => {
@@ -78,5 +76,12 @@ export const useLoginUser = () => {
         payload: errorResponse.response.data.error,
       });
     },
+  });
+};
+
+export const useGetUsers = () => {
+  return useQuery({
+    queryKey: ["blogs"],
+    queryFn: userService.getAll,
   });
 };
