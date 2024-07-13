@@ -16,7 +16,7 @@ const blogReducer = createSlice({
     newBlog(state, action) {
       return state.concat(action.payload);
     },
-    voteBlog(state, action) {
+    modifyBlog(state, action) {
       const updatedBlogs = state.map((blog) =>
         blog._id !== action.payload._id ? blog : action.payload,
       );
@@ -31,7 +31,7 @@ const blogReducer = createSlice({
   },
 });
 
-export const { initializeBlogs, newBlog, voteBlog, removeBlog } =
+export const { initializeBlogs, newBlog, modifyBlog, removeBlog } =
   blogReducer.actions;
 
 export const fetchAllBlogs = () => {
@@ -55,7 +55,6 @@ export const postBlog = (blog) => {
     try {
       const response = await blogService.create(blog);
       dispatch(newBlog(response));
-      // dispatch(fetchAllBlogs());
       dispatch(fetchUsers());
       dispatch(
         setNotification({
@@ -77,11 +76,41 @@ export const postBlog = (blog) => {
 export const updateBlog = (blog, payload) => {
   return async (dispatch) => {
     try {
-      const updatedBlog = await blogService.update(blog, payload);
-      dispatch(voteBlog(updatedBlog));
+      const updatedBlog = await blogService.update(blog, payload, false);
+      dispatch(modifyBlog(updatedBlog));
+      // custom logic pending
+      dispatch(fetchAllBlogs());
+
       dispatch(
         setNotification({
           message: `Blog '${updatedBlog.title}' was voted`,
+          error: false,
+        }),
+      );
+    } catch (err) {
+      console.log({ err });
+
+      dispatch(
+        setNotification({
+          message: `${err.response.data.message ?? err.response.data.error}`,
+          error: true,
+        }),
+      );
+    }
+  };
+};
+
+export const updateBlogComment = (blog, payload) => {
+  return async (dispatch) => {
+    try {
+      const updatedBlog = await blogService.update(blog, payload, true);
+      dispatch(modifyBlog(updatedBlog));
+      // custom logic pending
+      dispatch(fetchAllBlogs());
+
+      dispatch(
+        setNotification({
+          message: `Comment '${updatedBlog.comments[updatedBlog.comments.length - 1]}' was added`,
           error: false,
         }),
       );

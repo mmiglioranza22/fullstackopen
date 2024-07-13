@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const blogRouter = require("./controllers/blogs");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
+const commentsRouter = require("./controllers/comments");
 
 require("./mongoose_db");
 
@@ -38,7 +39,9 @@ app.use(morgan("dev"));
 app.use(tokenMiddleware);
 app.use("/api/users", usersRouter);
 app.use("/api/login", loginRouter);
+
 app.use("/api/blogs", userCheckMiddleware, blogRouter);
+// app.use("/api/blogs/:id/comments", userCheckMiddleware, commentsRouter);
 if (process.env.NODE_ENV === "test") {
   const testingRouter = require("./controllers/testing");
   app.use("/api/testing", testingRouter);

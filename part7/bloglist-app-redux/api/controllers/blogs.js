@@ -2,7 +2,11 @@ const express = require("express");
 const blogRouter = express.Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
+const commentsRouter = require("./comments");
+// https://expressjs.com/en/4x/api.html#express.router
+// https://stackoverflow.com/questions/72395842/using-express-mergeparams-with-typescript
+// https://gist.github.com/zcaceres/f38b208a492e4dcd45f487638eff716c
+blogRouter.use("/:id/comments", commentsRouter);
 
 blogRouter.get("/all", async (request, response, next) => {
   try {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { deleteBlog, updateBlog } from "../redux/reducers/blogReducer";
+import CommentForm from "./CommentForm";
 
 const Blog = ({ blog }) => {
   const dispatch = useDispatch();
@@ -29,6 +30,19 @@ const Blog = ({ blog }) => {
       </div>
 
       <p>added by {blog.user.name}</p>
+      <h3>comments</h3>
+      <CommentForm blog={blog} />
+      {blog.comments && blog.comments.length > 0 ? (
+        <ul>
+          {blog.comments.map((comment) => (
+            <li key={comment}>
+              <p>{comment}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No comments</p>
+      )}
     </>
     // <div style={{ border: "1px solid black", maxWidth: "300px" }}>
     //   {blog.title} {blog.author}

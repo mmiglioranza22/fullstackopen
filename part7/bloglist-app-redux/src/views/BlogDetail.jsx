@@ -6,7 +6,6 @@ const BlogDetail = ({ blogs }) => {
   if (!blogs) {
     return null;
   }
-  console.log({ blogId, blogs });
   const blog = blogs.find((blog) => blog._id === blogId);
 
   return <Blog blog={blog} />;

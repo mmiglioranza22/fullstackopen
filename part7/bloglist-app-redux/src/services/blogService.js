@@ -23,11 +23,16 @@ const create = (payload) => {
   return request.then((response) => response.data);
 };
 
-const update = (blogId, payload) => {
+const update = (blogId, payload, comment = false) => {
   const config = {
     headers: { Authorization: token },
   };
-  const request = axios.patch(`${baseUrl}/${blogId}`, payload, config);
+  let request;
+  if (comment) {
+    request = axios.post(`${baseUrl}/${blogId}/comments`, payload, config);
+  } else {
+    request = axios.patch(`${baseUrl}/${blogId}`, payload, config);
+  }
   return request.then((response) => response.data);
 };
 

@@ -24,7 +24,7 @@ const Notification = () => {
     <div
       data-testid="notification"
       style={{
-        background: "grey",
+        background: "lightgrey",
         border: notification.error ? "5px solid red" : "5px solid green",
         borderRadius: "5px",
         color: notification.error ? "red" : "green",
