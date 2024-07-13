@@ -1,7 +1,11 @@
 import { useState } from "react";
+import { useLoginUser } from "../hooks";
 
-const LoginForm = ({ handleBlogService }) => {
+const LoginForm = () => {
   const [loginData, setLoginData] = useState({ username: "", password: "" });
+
+  const { mutate: login, data } = useLoginUser();
+
   const handleChangeLoginForm = (ev) => {
     setLoginData((prev) => {
       return {
@@ -13,7 +17,8 @@ const LoginForm = ({ handleBlogService }) => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    handleBlogService(loginData);
+    login(loginData);
+    console.log({ data });
   };
 
   return (

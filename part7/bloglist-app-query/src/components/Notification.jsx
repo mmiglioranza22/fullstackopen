@@ -1,5 +1,21 @@
-const Notification = ({ message }) => {
-  if (message === null) {
+import { useContext, useEffect } from "react";
+import NotificationContext from "../context/notificationContext";
+
+const Notification = () => {
+  const [notification, dispatchNotification] = useContext(NotificationContext);
+
+  useEffect(() => {
+    let timer;
+    if (notification) {
+      timer = setTimeout(
+        () => dispatchNotification({ type: "CLEAR_NOTIFICATION" }),
+        5000,
+      );
+    }
+    return () => clearTimeout(timer);
+  }, [notification]);
+
+  if (notification === null) {
     return null;
   }
 
@@ -8,13 +24,13 @@ const Notification = ({ message }) => {
       data-testid="notification"
       style={{
         background: "grey",
-        border: message.error ? "5px solid red" : "5px solid green",
+        border: notification.error ? "5px solid red" : "5px solid green",
         borderRadius: "5px",
-        color: message.error ? "red" : "green",
+        color: notification.error ? "red" : "green",
         fontSize: "20px",
       }}
     >
-      <p>{message.message}</p>
+      <p>{notification.message}</p>
     </div>
   );
 };
