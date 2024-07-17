@@ -1,5 +1,7 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
+const { GraphQLError } = require("graphql");
+const { v1: uuid } = require("uuid");
 
 let authors = [
   {
@@ -101,6 +103,7 @@ const typeDefs = `
   type AuthorInfo {
     name: String!
     bookCount: Int
+    born: Int
   }
 
   type Query {
@@ -108,6 +111,19 @@ const typeDefs = `
     authorCount: Int
     allBooks(name: String, genre: String): [Book]
     allAuthors: [AuthorInfo]
+  }
+
+  type Mutation {
+    addBook(
+      title: String!
+      published: Int!
+      author: String!
+      genres: [String!]!
+    ): Book
+   editAuthor(
+      name: String!
+      born: Int!
+    ): Author 
   }
 `;
 
@@ -132,8 +148,31 @@ const resolvers = {
         return {
           name: author.name,
           bookCount: books.filter((book) => book.author === author.name).length,
+          born: author.born,
         };
       });
+    },
+  },
+
+  Mutation: {
+    addBook: (root, args) => {
+      const existingAuthor = books.findIndex(
+        (books) => books.author === args.author
+      );
+      if (existingAuthor === -1) {
+        authors = authors.concat({ name: args.author, id: uuid() });
+      }
+      const newBook = { ...args, id: uuid() };
+      books = books.concat(newBook);
+      return newBook;
+    },
+    editAuthor: (root, args) => {
+      const updatedAuthor = authors.findIndex(
+        (author) => author.name === args.name
+      );
+      if (updatedAuthor === -1) return null;
+      authors[updatedAuthor] = { ...authors[updatedAuthor], born: args.born };
+      return authors[updatedAuthor];
     },
   },
 };
