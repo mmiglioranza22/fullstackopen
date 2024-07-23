@@ -51,12 +51,7 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    bookCount: async () => {
-      const res = await Book.find({}).countDocuments();
-      console.log({ res });
-
-      return res;
-    },
+    bookCount: async () => await Book.find({}).countDocuments(),
     authorCount: async () => await Author.find({}).estimatedDocumentCount(),
     allBooks: async (root, args) => {
       // filters are not cummulative
@@ -72,25 +67,19 @@ const resolvers = {
     },
     allAuthors: async (root, args) => {
       const authors = await Author.find({});
-      const bookCounts = authors.map((author) => {
+
+      const books = await Book.find({}).populate("author");
+
+      return authors.map((author) => {
+        const bookCount = books.filter(
+          (book) => book.author.name === author.name
+        ).length;
         return {
-          author: author.name,
-          count: (async () =>
-            await Book.find({ "author._id": author._id }).countDocuments())(),
+          name: author.name,
+          bookCount: bookCount,
+          born: author.born,
         };
       });
-      const res = await Promise.all(bookCounts);
-      console.log({ res });
-      // authors.map();
-      return null;
-
-      // authors.map((author) => {
-      //   return {
-      //     name: author.name,
-      //     bookCount: books.filter((book) => book.author === author.name).length,
-      //     born: author.born,
-      //   };
-      // });
     },
   },
 
