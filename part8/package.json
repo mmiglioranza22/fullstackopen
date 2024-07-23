@@ -6,13 +6,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node library-backend.js",
-    "start:watch": "node --watch library-backend.js"
+    "start:watch": "node --watch library-backend.js",
+    "dev": "NODE_ENV=development node --watch --env-file .env library-backend.js",
+    "test:dev": "NODE_ENV=test node --watch --env-file .env library-backend.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@apollo/server": "^4.10.4",
+    "dotenv": "^16.4.5",
     "graphql": "^16.9.0",
+    "mongoose": "^8.5.1",
+    "mongoose-unique-validator": "^5.0.1",
     "uuid": "^10.0.0"
   }
 }
