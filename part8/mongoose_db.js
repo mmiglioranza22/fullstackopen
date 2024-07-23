@@ -30,10 +30,11 @@ mongoose
     const authors = await Author.find({});
 
     const bookPromises = books.map((book) => {
-      const authorId = authors.find(
-        (author) => author.name === book.author
-      )._id;
-      const updatedBook = { ...book, author: authorId };
+      const author = authors.find((author) => author.name === book.author);
+      const updatedBook = {
+        ...book,
+        author: { id: author._id, name: author.name },
+      };
       return new Book(updatedBook).save();
     });
     return Promise.all(bookPromises);

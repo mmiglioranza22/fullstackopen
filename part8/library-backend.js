@@ -2,7 +2,8 @@ const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
 const { GraphQLError } = require("graphql");
 const { v1: uuid } = require("uuid");
-const { authors, books } = require("./seed");
+const Book = require("./models/book");
+const Author = require("./models/author");
 
 require("./mongoose_db");
 
@@ -50,52 +51,70 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
-    allBooks: (root, args) => {
+    bookCount: async () => {
+      const res = await Book.find({}).countDocuments();
+      console.log({ res });
+
+      return res;
+    },
+    authorCount: async () => await Author.find({}).estimatedDocumentCount(),
+    allBooks: async (root, args) => {
       // filters are not cummulative
       // const filters = Object.entries(args);
 
       if (args.name) {
-        return books.filter((books) => books.author === args.name);
+        return await Book.find({ "author.name": args.name }).populate("author");
       } else if (args.genre) {
-        return books.filter((books) => books.genres.includes(args.genre));
+        return await Book.find({ genres: args.genre }).populate("author");
       } else {
-        return books;
+        return await Book.find({}).populate("author");
       }
     },
-    allAuthors: (root, args) => {
-      return authors.map((author) => {
+    allAuthors: async (root, args) => {
+      const authors = await Author.find({});
+      const bookCounts = authors.map((author) => {
         return {
-          name: author.name,
-          bookCount: books.filter((book) => book.author === author.name).length,
-          born: author.born,
+          author: author.name,
+          count: (async () =>
+            await Book.find({ "author._id": author._id }).countDocuments())(),
         };
       });
+      const res = await Promise.all(bookCounts);
+      console.log({ res });
+      // authors.map();
+      return null;
+
+      // authors.map((author) => {
+      //   return {
+      //     name: author.name,
+      //     bookCount: books.filter((book) => book.author === author.name).length,
+      //     born: author.born,
+      //   };
+      // });
     },
   },
 
-  Mutation: {
-    addBook: (root, args) => {
-      const existingAuthor = books.findIndex(
-        (books) => books.author === args.author
-      );
-      if (existingAuthor === -1) {
-        authors = authors.concat({ name: args.author, id: uuid() });
-      }
-      const newBook = { ...args, id: uuid() };
-      books = books.concat(newBook);
-      return newBook;
-    },
-    editAuthor: (root, args) => {
-      const updatedAuthor = authors.findIndex(
-        (author) => author.name === args.name
-      );
-      if (updatedAuthor === -1) return null;
-      authors[updatedAuthor] = { ...authors[updatedAuthor], born: args.born };
-      return authors[updatedAuthor];
-    },
-  },
+  // Mutation: {
+  //   addBook: async (root, args) => {
+  //     const existingAuthor = books.findIndex(
+  //       (books) => books.author === args.author
+  //     );
+  //     if (existingAuthor === -1) {
+  //       authors = authors.concat({ name: args.author, id: uuid() });
+  //     }
+  //     const newBook = { ...args, id: uuid() };
+  //     books = books.concat(newBook);
+  //     return newBook;
+  //   },
+  //   editAuthor: async (root, args) => {
+  //     const updatedAuthor = authors.findIndex(
+  //       (author) => author.name === args.name
+  //     );
+  //     if (updatedAuthor === -1) return null;
+  //     authors[updatedAuthor] = { ...authors[updatedAuthor], born: args.born };
+  //     return authors[updatedAuthor];
+  //   },
+  // },
 };
 
 const server = new ApolloServer({
