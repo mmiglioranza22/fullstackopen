@@ -4,6 +4,7 @@ const { GraphQLError } = require("graphql");
 const { v1: uuid } = require("uuid");
 const Book = require("./models/book");
 const Author = require("./models/author");
+const mongoose = require("mongoose");
 
 require("./mongoose_db");
 
@@ -83,27 +84,43 @@ const resolvers = {
     },
   },
 
-  // Mutation: {
-  //   addBook: async (root, args) => {
-  //     const existingAuthor = books.findIndex(
-  //       (books) => books.author === args.author
-  //     );
-  //     if (existingAuthor === -1) {
-  //       authors = authors.concat({ name: args.author, id: uuid() });
-  //     }
-  //     const newBook = { ...args, id: uuid() };
-  //     books = books.concat(newBook);
-  //     return newBook;
-  //   },
-  //   editAuthor: async (root, args) => {
-  //     const updatedAuthor = authors.findIndex(
-  //       (author) => author.name === args.name
-  //     );
-  //     if (updatedAuthor === -1) return null;
-  //     authors[updatedAuthor] = { ...authors[updatedAuthor], born: args.born };
-  //     return authors[updatedAuthor];
-  //   },
-  // },
+  Mutation: {
+    addBook: async (root, args) => {
+      let author;
+      let bookData = args;
+      const existingAuthor = await Author.findOne({ name: args.author });
+      if (existingAuthor) {
+        bookData = {
+          ...bookData,
+          author: {
+            id: existingAuthor._id,
+            name: existingAuthor.name,
+          },
+        };
+      } else {
+        author = await Author.create({ name: args.author });
+        bookData = {
+          ...bookData,
+          author: {
+            id: author._id,
+            name: author.name,
+          },
+        };
+      }
+      const newBook = await Book.create(bookData);
+
+      return newBook;
+    },
+    editAuthor: async (root, args) => {
+      const author = await Author.findOneAndUpdate(
+        { name: args.name },
+        { born: args.born },
+        { new: true }
+      );
+
+      return author;
+    },
+  },
 };
 
 const server = new ApolloServer({
