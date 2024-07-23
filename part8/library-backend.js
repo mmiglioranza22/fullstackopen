@@ -86,39 +86,59 @@ const resolvers = {
 
   Mutation: {
     addBook: async (root, args) => {
-      let author;
-      let bookData = args;
-      const existingAuthor = await Author.findOne({ name: args.author });
-      if (existingAuthor) {
-        bookData = {
-          ...bookData,
-          author: {
-            id: existingAuthor._id,
-            name: existingAuthor.name,
-          },
-        };
-      } else {
-        author = await Author.create({ name: args.author });
-        bookData = {
-          ...bookData,
-          author: {
-            id: author._id,
-            name: author.name,
-          },
-        };
-      }
-      const newBook = await Book.create(bookData);
+      try {
+        let author;
+        let bookData = args;
+        const existingAuthor = await Author.findOne({ name: args.author });
+        if (existingAuthor) {
+          bookData = {
+            ...bookData,
+            author: {
+              id: existingAuthor._id,
+              name: existingAuthor.name,
+            },
+          };
+        } else {
+          author = await Author.create({ name: args.author });
+          bookData = {
+            ...bookData,
+            author: {
+              id: author._id,
+              name: author.name,
+            },
+          };
+        }
+        const newBook = await Book.create(bookData);
 
-      return newBook;
+        return newBook;
+      } catch (error) {
+        throw new GraphQLError("Invalid arguments", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args,
+            error,
+          },
+        });
+      }
     },
     editAuthor: async (root, args) => {
-      const author = await Author.findOneAndUpdate(
-        { name: args.name },
-        { born: args.born },
-        { new: true }
-      );
+      try {
+        const author = await Author.findOneAndUpdate(
+          { name: args.name },
+          { born: args.born },
+          { new: true }
+        );
 
-      return author;
+        return author;
+      } catch (error) {
+        throw new GraphQLError("Name or born values not valid", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args,
+            error,
+          },
+        });
+      }
     },
   },
 };
