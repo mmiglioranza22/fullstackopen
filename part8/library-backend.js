@@ -111,7 +111,6 @@ const resolvers = {
           extensions: {
             code: "INVALID_TOKEN",
             invalidArgs: args,
-            error,
           },
         });
       } else {

@@ -1,9 +1,10 @@
 import { useMutation } from "@apollo/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CREATE_BOOK, ALL_AUTHORS, ALL_BOOKS } from "../queries";
 
-const NewBook = (props) => {
-  const [createBook] = useMutation(CREATE_BOOK, {
+// eslint-disable-next-line react/prop-types
+const NewBook = ({ show, setPage }) => {
+  const [createBook, result] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
   });
 
@@ -13,8 +14,14 @@ const NewBook = (props) => {
   const [genre, setGenre] = useState("");
   const [genres, setGenres] = useState([]);
 
+  useEffect(() => {
+    if (result.data) {
+      setPage("books");
+    }
+  }, [result.data]);
+
   // eslint-disable-next-line react/prop-types
-  if (!props.show) {
+  if (!show) {
     return null;
   }
 
