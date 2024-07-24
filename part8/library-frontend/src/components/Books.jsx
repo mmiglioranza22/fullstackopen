@@ -1,19 +1,52 @@
 import { useQuery } from "@apollo/client";
-import { ALL_BOOKS } from "../queries";
+import { ALL_BOOKS, ALL_BOOKS_BY_GENRE } from "../queries";
+import { useEffect, useState } from "react";
 
 const Books = (props) => {
-  const result = useQuery(ALL_BOOKS);
+  const [genres, setGenres] = useState([]);
+  const [genre, setGenre] = useState("");
+  const [books, setBooks] = useState([]);
+
+  // const allBooksResult = useQuery(ALL_BOOKS);
+  const allBooksResult = useQuery(ALL_BOOKS_BY_GENRE, {
+    variables: { genreToSearch: genre },
+  });
+
+  useEffect(() => {
+    if (!genre && allBooksResult.data) {
+      setBooks(allBooksResult.data?.allBooks);
+      const genres = new Set(
+        allBooksResult.data.allBooks.map((book) => book.genres).flat()
+      );
+      setGenres(Array.from(genres));
+    }
+  }, []);
+  console.log(genres, books);
+
+  useEffect(() => {
+    if (allBooksResult.data) {
+      console.log({ genre, allBooksResult });
+      setBooks(allBooksResult.data?.allBooks);
+      // const genres = new Set(
+      //   allBooksResult.data.allBooks.map((book) => book.genres).flat()
+      // );
+      // setGenres(Array.from(genres));
+    }
+  }, [allBooksResult.data]);
 
   // eslint-disable-next-line react/prop-types
   if (!props.show) {
     return null;
   }
 
-  if (result.loading) {
+  if (allBooksResult.loading) {
     return <div>loading...</div>;
   }
 
-  const books = result.data?.allBooks;
+  const handleFilter = (genre) => {
+    console.log(genre);
+    setGenre(genre);
+  };
 
   return (
     <div>
@@ -35,6 +68,22 @@ const Books = (props) => {
           ))}
         </tbody>
       </table>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "4px",
+          marginTop: "8px",
+          width: "450px",
+          flexWrap: "wrap",
+        }}
+      >
+        {genres.map((genre) => (
+          <button key={genre} onClick={() => handleFilter(genre)}>
+            {genre}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
