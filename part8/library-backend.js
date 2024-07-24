@@ -181,11 +181,11 @@ const resolvers = {
       }
     },
     createUser: async (root, args) => {
+      // it should save the password hash here with bcrypt
       const user = new User({
         username: args.username,
         favoriteGenre: args.favoriteGenre,
       });
-
       return user.save().catch((error) => {
         throw new GraphQLError("Creating the user failed", {
           extensions: {
@@ -198,7 +198,7 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username });
-
+      // actually it should check the passwordHash
       if (!user || args.password !== "secret") {
         throw new GraphQLError("wrong credentials", {
           extensions: {
@@ -212,7 +212,9 @@ const resolvers = {
         id: user._id,
       };
 
-      return { value: jwt.sign(userForToken, process.env.SECRET) };
+      const token = jwt.sign(userForToken, process.env.SECRET);
+
+      return { value: token };
     },
   },
 };
@@ -225,6 +227,8 @@ const server = new ApolloServer({
 startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async ({ req, res }) => {
+    // context of each request, logic kind of works as a middleware for currentUser -> userCheckMiddleware
+    // token is ALWAYS created / return on login from a valid user
     const auth = req ? req.headers.authorization : null;
     if (auth && auth.startsWith("Bearer ")) {
       const decodedToken = jwt.verify(auth.substring(7), process.env.SECRET);
