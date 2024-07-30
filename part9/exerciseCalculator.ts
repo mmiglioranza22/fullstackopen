@@ -13,7 +13,6 @@ interface Result {
   average: number;
 }
 
-const rating = () => {};
 const calculateExercises = (days: number[], target: number): Result => {
   const rating =
     days.filter((day) => day >= target).length >= 3
@@ -42,4 +41,8 @@ const calculateExercises = (days: number[], target: number): Result => {
   return result;
 };
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+const args = process.argv.slice(2).map((el) => Number(el));
+const target = args[0];
+const days = args.slice(1, args.length);
+
+console.log(calculateExercises(days, target));

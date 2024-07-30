@@ -46,4 +46,7 @@ const calculateBmi = (height: number, weight: number): string => {
   }
 };
 
-console.log(calculateBmi(180, 74));
+const args = process.argv.slice(2).map((el) => Number(el));
+const height = args[0];
+const weight = args[1];
+console.log(calculateBmi(height, weight));
