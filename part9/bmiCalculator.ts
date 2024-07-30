@@ -1,4 +1,4 @@
-const calculateBmi = (height: number, weight: number): string => {
+export const calculateBmi = (height: number, weight: number): string => {
   try {
     const index = weight / Math.pow(height / 100, 2);
     if (weight <= 0) {
@@ -43,10 +43,11 @@ const calculateBmi = (height: number, weight: number): string => {
       errorMessage += error.message;
     }
     console.log(errorMessage);
+    return "";
   }
 };
 
-const args = process.argv.slice(2).map((el) => Number(el));
-const height = args[0];
-const weight = args[1];
-console.log(calculateBmi(height, weight));
+// const args = process.argv.slice(2).map((el) => Number(el));
+// const height = args[0];
+// const weight = args[1];
+// console.log(calculateBmi(height, weight));
