@@ -3,7 +3,7 @@ type Rating =
   | "perfect"
   | "you didn't even try, you need to work out more";
 
-interface Result {
+export interface Result {
   periodLength: number;
   trainingDays: number;
   success: boolean;
@@ -13,7 +13,7 @@ interface Result {
   average: number;
 }
 
-const calculateExercises = (days: number[], target: number): Result => {
+export const calculateExercises = (days: number[], target: number): Result => {
   const rating =
     days.filter((day) => day >= target).length >= 3
       ? 3
@@ -41,8 +41,8 @@ const calculateExercises = (days: number[], target: number): Result => {
   return result;
 };
 
-const args = process.argv.slice(2).map((el) => Number(el));
-const target = args[0];
-const days = args.slice(1, args.length);
+// const args = process.argv.slice(2).map((el) => Number(el));
+// const target = args[0];
+// const days = args.slice(1, args.length);
 
-console.log(calculateExercises(days, target));
+// console.log(calculateExercises(days, target));
