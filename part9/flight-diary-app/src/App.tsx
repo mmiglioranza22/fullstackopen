@@ -1,5 +1,11 @@
+import DiaryEntryForm from "./components/DiaryEntryForm";
+
 const App = () => {
-  return <></>;
+  return (
+    <>
+      <DiaryEntryForm />
+    </>
+  );
 };
 
 export default App;
