@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DiaryEntry, NewDiaryEntry } from "../types";
+import { DiaryEntry, NewDiaryEntry, Visibility, Weather } from "../types";
 import entriesService, { ValidationError } from "../services";
 import { isString, isVisibility, isWeather } from "../utils";
 import axios from "axios";
@@ -84,9 +84,9 @@ const DiaryEntryForm = ({ handleNewEntry }: DiaryEntryFormProps) => {
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <p>
-          <label>date</label>
+          <label>date: </label>
           <input
-            type="text"
+            type="date"
             value={entry?.date}
             onChange={handleChange}
             // onChange={(ev) => setEntryDate(ev.target.value)}
@@ -94,29 +94,41 @@ const DiaryEntryForm = ({ handleNewEntry }: DiaryEntryFormProps) => {
           />
         </p>
         <p>
-          <label>visibility</label>
-          <input
-            type="text"
-            value={entry?.visibility}
-            // value={entryVisibility}
-            onChange={handleChange}
-            // onChange={(ev) => setEntryVisibility(ev.target.value)}
-            name="visibility"
-          />
+          <label>visibility: </label>
+          {Object.values(Visibility).map((visibility) => {
+            return (
+              <span key={visibility.toString()}>
+                {visibility.toString()}
+                <input
+                  type="radio"
+                  name="visibility"
+                  value={visibility.toString()}
+                  checked={visibility.toString() === entry?.visibility}
+                  onChange={handleChange}
+                />
+              </span>
+            );
+          })}
         </p>
         <p>
-          <label>weather</label>
-          <input
-            type="text"
-            value={entry?.weather}
-            // value={entryWeather}
-            onChange={handleChange}
-            // onChange={(ev) => setEntryWeather(ev.target.value)}
-            name="weather"
-          />
+          <label>weather: </label>
+          {Object.values(Weather).map((weather) => {
+            return (
+              <span key={weather.toString()}>
+                {weather.toString()}
+                <input
+                  type="radio"
+                  name="weather"
+                  value={weather.toString()}
+                  checked={weather.toString() === entry?.weather}
+                  onChange={handleChange}
+                />
+              </span>
+            );
+          })}
         </p>
         <p>
-          <label>comment</label>
+          <label>comment: </label>
           <input
             type="text"
             value={entry?.comment}
