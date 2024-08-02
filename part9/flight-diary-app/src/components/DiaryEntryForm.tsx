@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { DiaryEntry, NewDiaryEntry } from "../types";
-import entriesService from "../services";
+import entriesService, { ValidationError } from "../services";
+import { isString, isVisibility, isWeather } from "../utils";
+import axios from "axios";
 
 interface DiaryEntryFormProps {
   handleNewEntry: (entry: DiaryEntry) => void;
@@ -18,8 +20,38 @@ const DiaryEntryForm = ({ handleNewEntry }: DiaryEntryFormProps) => {
     comment: "",
   });
 
+  const [error, setError] = useState<string | null>(null);
+
   const handleChange = (ev: React.SyntheticEvent) => {
     if (ev.target instanceof HTMLInputElement) {
+      // not the best error handling
+      switch (ev.target.name) {
+        case "date":
+          // this will always be string, validation should be different
+          !isString(ev.target.value)
+            ? setError("Error: Incorrect date: " + ev.target.value)
+            : setError(null);
+          break;
+        case "comment":
+          !isString(ev.target.value)
+            ? setError("Error: Incorrect comment: " + ev.target.value)
+            : setError(null);
+          break;
+        case "weather":
+          !isWeather(ev.target.value)
+            ? setError("Error: Incorrect weather: " + ev.target.value)
+            : setError(null);
+          break;
+        case "visibility":
+          !isVisibility(ev.target.value)
+            ? setError("Error: Incorrect visibility: " + ev.target.value)
+            : setError(null);
+          break;
+        default:
+          // exhaustive tipe checking needs refactor of all switch, not used for now
+          return null;
+      }
+      // this gets set nonetheless it will not trigger the service post
       setEntry({
         ...entry,
         [ev.target.name]: ev.target.value,
@@ -29,13 +61,27 @@ const DiaryEntryForm = ({ handleNewEntry }: DiaryEntryFormProps) => {
 
   const handleSubmit = (ev: React.SyntheticEvent): void => {
     ev.preventDefault();
-    if (entry) {
-      entriesService.create(entry).then((data) => handleNewEntry(data));
+    // service will trigger if no values are sent (error initial state is null)
+    if (entry && !error) {
+      entriesService
+        .create(entry)
+        .then((data) => data && handleNewEntry(data))
+        .catch((error) => {
+          if (
+            axios.isAxiosError<ValidationError, Record<string, unknown>>(error)
+          ) {
+            setError(error.message);
+          } else {
+            return null;
+          }
+        });
     }
   };
+
   return (
     <div>
       <h1>Add new entry</h1>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <p>
           <label>date</label>

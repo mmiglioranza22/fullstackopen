@@ -15,8 +15,7 @@ const App = () => {
   // or via query invalidation and automatic refetch (react query, graphql)
   // This is a hack for simplification
   const handleNewEntry = (newEntry: DiaryEntry) => {
-    // console.log(newEntry);
-    if (entries.findIndex((e) => e.id === newEntry.id) === -1) {
+    if (entries.findIndex((e) => e.id === newEntry?.id) === -1) {
       setEntries([...entries, newEntry]);
     }
   };
