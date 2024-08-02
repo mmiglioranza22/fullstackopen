@@ -1,7 +1,12 @@
 import { useState } from "react";
-import { NewDiaryEntry } from "../types";
+import { DiaryEntry, NewDiaryEntry } from "../types";
+import entriesService from "../services";
 
-const DiaryEntryForm = () => {
+interface DiaryEntryFormProps {
+  handleNewEntry: (entry: DiaryEntry) => void;
+}
+
+const DiaryEntryForm = ({ handleNewEntry }: DiaryEntryFormProps) => {
   // const [entryDate, setEntryDate] = useState<string>("");
   // const [entryVisibility, setEntryVisibility] = useState<string>("");
   // const [entryWeather, setEntryWeather] = useState<string>("");
@@ -24,8 +29,9 @@ const DiaryEntryForm = () => {
 
   const handleSubmit = (ev: React.SyntheticEvent): void => {
     ev.preventDefault();
-    console.log({ entry });
-    // reqyuest
+    if (entry) {
+      entriesService.create(entry).then((data) => handleNewEntry(data));
+    }
   };
   return (
     <div>
