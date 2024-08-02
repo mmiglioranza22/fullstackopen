@@ -9,6 +9,11 @@ router.get("/", (_req, res) => {
   res.status(200).json(data);
 });
 
+router.get("/:id", (req, res) => {
+  const data = patientService.getPatientById(req.params.id);
+  res.status(200).json(data);
+});
+
 router.post("/", (req, res) => {
   try {
     const parsedBody = toNewPatient(req.body);

@@ -1,5 +1,5 @@
 import { v1 as uuid } from "uuid";
-import { Gender, Patient, PatientRequestDTO } from "../types";
+import { Patient, PatientRequestDTO } from "../types";
 import data from "../data/patients";
 import { toNewPatient } from "../utils";
 
@@ -7,6 +7,7 @@ import { toNewPatient } from "../utils";
 const patientEntries: Patient[] = data.map((obj) => {
   const object = toNewPatient(obj) as Patient;
   object.id = obj.id;
+  object.entries = [];
   return object;
 });
 
@@ -25,13 +26,19 @@ const getPatients = (): PatientRequestDTO[] => {
   return patients;
 };
 
+const getPatientById = (id: string): Patient | null => {
+  const patient = patientEntries.find((patient) => patient.id === id) ?? null;
+  return patient;
+};
+
 const addPatient = (input: PatientRequestDTO): Patient => {
   const patient: Patient = {
     id: uuid(),
+    entries: [],
     ...input,
   };
   patientEntries.push(patient);
   return patient;
 };
 
-export default { getPatients, addPatient };
+export default { getPatients, addPatient, getPatientById };
