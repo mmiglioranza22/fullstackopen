@@ -7,19 +7,19 @@ import { toNewPatient } from "../utils";
 const patientEntries: Patient[] = data.map((obj) => {
   const object = toNewPatient(obj) as Patient;
   object.id = obj.id;
-  object.entries = [];
   return object;
 });
 
 const getPatients = (): PatientRequestDTO[] => {
   const patients = patientEntries.map(
-    ({ id, name, dateOfBirth, gender, occupation }) => {
+    ({ id, name, dateOfBirth, gender, occupation, entries }) => {
       return {
         id,
         name,
         dateOfBirth,
         gender,
         occupation,
+        entries,
       };
     }
   );
@@ -34,7 +34,6 @@ const getPatientById = (id: string): Patient | null => {
 const addPatient = (input: PatientRequestDTO): Patient => {
   const patient: Patient = {
     id: uuid(),
-    entries: [],
     ...input,
   };
   patientEntries.push(patient);

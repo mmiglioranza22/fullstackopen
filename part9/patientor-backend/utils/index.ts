@@ -1,4 +1,4 @@
-import { Gender, PatientRequestDTO } from "../types";
+import { Entry, Gender, PatientRequestDTO } from "../types";
 
 export const toNewPatient = (input: unknown): PatientRequestDTO => {
   if (!input || typeof input !== "object") {
@@ -8,13 +8,15 @@ export const toNewPatient = (input: unknown): PatientRequestDTO => {
     "name" in input &&
     "dateOfBirth" in input &&
     "occupation" in input &&
-    "gender" in input
+    "gender" in input &&
+    "entries" in input
   ) {
     const newPatient: PatientRequestDTO = {
       name: parseString(input.name),
       dateOfBirth: parseDate(input.dateOfBirth),
       occupation: parseString(input.occupation),
       gender: parseGender(input.gender),
+      entries: parseEntries(input.entries),
       ssn: "ssn" in input ? parseString(input.ssn) : undefined,
     };
 
@@ -59,4 +61,20 @@ const parseGender = (gender: unknown): Gender => {
     throw new Error("Incorrect gender provided");
   }
   return gender;
+};
+
+// type predicate as return type to ensure specific type is returned
+const isEntry = (entry: any): entry is Entry => {
+  return (
+    entry.type === "HealthCheck" ||
+    entry.type === "OccupationalHealthcare" ||
+    entry.type === "Hospital"
+  );
+};
+
+const parseEntries = (entries: any): Entry[] => {
+  if (!Array.isArray(entries) || !entries.every(isEntry)) {
+    throw new Error("Incorrect or missing entries");
+  }
+  return entries;
 };
