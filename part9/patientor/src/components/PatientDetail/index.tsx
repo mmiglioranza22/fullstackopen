@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { Patient } from "../../types";
+import { Diagnosis, Patient } from "../../types";
 import { useParams } from "react-router-dom";
 import patientService from "../../services/patients";
 
-// interface PatientDetailProps {
-//   patient: Patient | undefined;
-// }
+interface PatientDetailProps {
+  diagnoses: Diagnosis[];
+}
 
-const PatientDetail = () => {
+const PatientDetail = ({ diagnoses }: PatientDetailProps) => {
   const [patient, setPatient] = useState<Patient | undefined>(undefined);
-
   const { id: patientId } = useParams();
+
   useEffect(() => {
     if (patientId) {
       const fetchPatientById = async () => {
@@ -38,7 +38,16 @@ const PatientDetail = () => {
                   Code :
                   <ul>
                     {entry.diagnosisCodes?.map((code) => {
-                      return <li>{code}</li>;
+                      const diagnosisDetail = diagnoses.find(
+                        (d) => d.code === code
+                      );
+
+                      return (
+                        <li>
+                          {code} : {diagnosisDetail?.name} -{" "}
+                          {diagnosisDetail?.latin}
+                        </li>
+                      );
                     })}
                   </ul>
                 </p>

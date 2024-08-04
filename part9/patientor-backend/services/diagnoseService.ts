@@ -5,4 +5,18 @@ const getDiagnoses = (): Diagnosis[] => {
   return data;
 };
 
-export default { getDiagnoses };
+const addDiagnosis = (diagnosis: Diagnosis): Diagnosis => {
+  const existingDiagnosisIndex = data.findIndex(
+    (diag) => diag.code === diagnosis.code
+  );
+  if (existingDiagnosisIndex > -1) {
+    data[existingDiagnosisIndex].name = diagnosis.name;
+    data[existingDiagnosisIndex].latin = diagnosis.latin;
+    return data[existingDiagnosisIndex];
+  } else {
+    data.push(diagnosis);
+    return diagnosis;
+  }
+};
+
+export default { getDiagnoses, addDiagnosis };

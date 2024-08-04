@@ -1,4 +1,4 @@
-import { Entry, Gender, PatientRequestDTO } from "../types";
+import { Diagnosis, Entry, Gender, PatientRequestDTO } from "../types";
 
 export const toNewPatient = (input: unknown): PatientRequestDTO => {
   if (!input || typeof input !== "object") {
@@ -21,6 +21,22 @@ export const toNewPatient = (input: unknown): PatientRequestDTO => {
     };
 
     return newPatient;
+  }
+  throw new Error("Incorrect data: some fields are missing");
+};
+
+export const toNewDiagnoses = (input: unknown): Diagnosis => {
+  if (!input || typeof input !== "object") {
+    throw new Error("Incorrect or missing data");
+  }
+  if ("name" in input && "code" in input) {
+    const newDiagnosis: Diagnosis = {
+      name: parseString(input.name),
+      code: parseString(input.code),
+      latin: "latin" in input ? parseString(input.latin) : undefined,
+    };
+
+    return newDiagnosis;
   }
   throw new Error("Incorrect data: some fields are missing");
 };
