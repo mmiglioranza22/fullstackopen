@@ -17,3 +17,10 @@ export const parseEntries = (entries: any): Entry[] => {
   }
   return entries;
 };
+// the important thing here is that both the param value should be never, that is, NEVER call this function with any value
+export const assertNeverCheck = (value: never): never => {
+  // this is not needed, only to show something via console and identify the error
+  throw new Error(
+    `Unhandled discriminated union member: ${JSON.stringify(value)}`
+  );
+};
