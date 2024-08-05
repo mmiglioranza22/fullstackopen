@@ -1,5 +1,5 @@
 import { v1 as uuid } from "uuid";
-import { Entry, Patient, PatientRequestDTO } from "../types";
+import { EntryRequestDTO, Patient, PatientRequestDTO } from "../types";
 import data from "../data/patients";
 import { toNewPatient } from "../utils";
 
@@ -40,14 +40,16 @@ const addPatient = (input: PatientRequestDTO): Patient => {
   return patient;
 };
 
-const addEntry = (id: string, entry: Entry): Patient => {
-  console.log({ id, entry });
+const addEntry = (id: string, entry: EntryRequestDTO): Patient => {
   const patientIndex = patientEntries.findIndex((p) => p.id === id);
 
   if (patientIndex > -1) {
     patientEntries[patientIndex].entries = [
       ...patientEntries[patientIndex].entries,
-      entry,
+      {
+        id: uuid(),
+        ...entry,
+      },
     ];
 
     return patientEntries[patientIndex];

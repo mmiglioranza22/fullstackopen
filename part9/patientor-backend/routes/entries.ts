@@ -1,17 +1,14 @@
 import { Router } from "express";
 import patientService from "../services/patientService";
+import { toNewEntry } from "../utils";
 
 const router = Router({ mergeParams: true });
 
 router.post("/:id/entries", (req, res) => {
   try {
-    const updatedPatient = patientService.addEntry(
-      req.params.id,
-      req.body.entry
-    );
-
+    const newEntry = toNewEntry(req.body.entry);
+    const updatedPatient = patientService.addEntry(req.params.id, newEntry);
     res.status(201).json(updatedPatient);
-    // res.status(201).json(newDiagnosis);
   } catch (error: unknown) {
     let errorMessage = "Something went wrong.";
     if (error instanceof Error) {

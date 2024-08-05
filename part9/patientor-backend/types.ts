@@ -67,19 +67,19 @@ export type PickedPatient = Pick<
 
 export type PatientRequestDTO = Omit<Patient, "id">;
 
-/*
 // Omit with unions open issue
 // https://github.com/microsoft/TypeScript/issues/42680
 // DONT DECLARE OMIT TYPES LIKE THIS!
-type Etc = Omit<Entry, "id">;
+
+// type Etc = Omit<Entry, "id">;
 
 // Define special omit for unions
 type UnionOmit<T, K extends string | number | symbol> = T extends unknown
   ? Omit<T, K>
   : never;
 // Define Entry without the 'id' property
-type EntryWithoutId = UnionOmit<Entry, "id">;
-
+export type EntryRequestDTO = UnionOmit<Entry, "id">;
+/*
 // or
 type SpecificOmit =
   | Omit<HospitalEntry, "id">

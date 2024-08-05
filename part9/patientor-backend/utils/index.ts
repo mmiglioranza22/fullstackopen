@@ -1,4 +1,10 @@
-import { Diagnosis, Entry, Gender, PatientRequestDTO } from "../types";
+import {
+  Diagnosis,
+  Entry,
+  EntryRequestDTO,
+  Gender,
+  PatientRequestDTO,
+} from "../types";
 
 export const toNewPatient = (input: unknown): PatientRequestDTO => {
   if (!input || typeof input !== "object") {
@@ -39,6 +45,43 @@ export const toNewDiagnoses = (input: unknown): Diagnosis => {
     return newDiagnosis;
   }
   throw new Error("Incorrect data: some fields are missing");
+};
+
+export const toNewEntry = (input: unknown): EntryRequestDTO => {
+  console.log({ input });
+  if (!input || typeof input !== "object") {
+    throw new Error("Incorrect or missing data");
+  }
+  let baseEntry;
+  if (
+    "description" in input &&
+    "date" in input &&
+    "specialist" in input &&
+    "type" in input
+  ) {
+    baseEntry = {
+      ...input,
+      description: parseString(input.description),
+      date: parseDate(input.date),
+      specialist: parseString(input.specialist),
+      diagnosisCodes:
+        "diagnosisCodes" in input
+          ? parseDiagnosisCodes(input.diagnosisCodes)
+          : undefined,
+    };
+
+    return baseEntry as EntryRequestDTO;
+  }
+  throw new Error("Incorrect data: some fields are missing");
+};
+
+const parseDiagnosisCodes = (object: unknown): Array<Diagnosis["code"]> => {
+  if (!object || typeof object !== "object" || !("diagnosisCodes" in object)) {
+    // we will just trust the data to be in correct form
+    return [] as Array<Diagnosis["code"]>;
+  }
+
+  return object.diagnosisCodes as Array<Diagnosis["code"]>;
 };
 
 // type predicate as return type to ensure specific type is returned
