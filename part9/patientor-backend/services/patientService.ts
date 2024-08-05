@@ -1,5 +1,5 @@
 import { v1 as uuid } from "uuid";
-import { Patient, PatientRequestDTO } from "../types";
+import { Entry, Patient, PatientRequestDTO } from "../types";
 import data from "../data/patients";
 import { toNewPatient } from "../utils";
 
@@ -40,4 +40,20 @@ const addPatient = (input: PatientRequestDTO): Patient => {
   return patient;
 };
 
-export default { getPatients, addPatient, getPatientById };
+const addEntry = (id: string, entry: Entry): Patient => {
+  console.log({ id, entry });
+  const patientIndex = patientEntries.findIndex((p) => p.id === id);
+
+  if (patientIndex > -1) {
+    patientEntries[patientIndex].entries = [
+      ...patientEntries[patientIndex].entries,
+      entry,
+    ];
+
+    return patientEntries[patientIndex];
+  } else {
+    throw new Error("Patient id does not exist");
+  }
+};
+
+export default { getPatients, addPatient, getPatientById, addEntry };

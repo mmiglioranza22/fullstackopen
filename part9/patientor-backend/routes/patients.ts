@@ -1,8 +1,12 @@
 import { Router } from "express";
+import entriesRouter from "./entries";
 import patientService from "../services/patientService";
 import { toNewPatient } from "../utils";
 
 const router = Router();
+// This was done because typescript did not reconized parent router's param from withing child router
+// check commentsRouter part7 dir
+router.use("/", entriesRouter);
 
 router.get("/", (_req, res) => {
   const data = patientService.getPatients();
